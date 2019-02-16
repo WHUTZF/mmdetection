@@ -1,9 +1,9 @@
-import os
 import mmcv
 import numpy as np
 from functools import partial
 from six.moves import map, zip
 from subprocess import Popen, PIPE
+
 
 def tensor2imgs(tensor, mean=(0, 0, 0), std=(1, 1, 1), to_rgb=True):
     num_imgs = tensor.size(0)
@@ -40,7 +40,8 @@ def unmap(data, count, inds, fill=0):
 def select_gpus(N, max_utilization=.5, max_memory_usage=.5):
     p = Popen(["nvidia-smi",
                 "--query-gpu=index,utilization.gpu,memory.total,memory.used",
-                "--format=csv,noheader,nounits"], stdout=PIPE)
+                "--format=csv,noheader,nounits"], 
+                stdout=PIPE)
     output = p.stdout.read().decode('UTF-8')
     gpus = [[int(x) for x in x.split(',')] for x in output.splitlines()]
     gpu_ids = []
@@ -48,5 +49,5 @@ def select_gpus(N, max_utilization=.5, max_memory_usage=.5):
         if utilization / 100.0 < max_utilization:
             if used * 1.0 / total < max_memory_usage:
                 gpu_ids.append(index)
-    selected = np.random.choice(gpu_ids,size=(N,), replace=False)
+    selected = np.random.choice(gpu_ids,size=(N, ), replace=False)
     return list(selected)
