@@ -38,10 +38,10 @@ def unmap(data, count, inds, fill=0):
 
 
 def select_gpus(N, max_utilization=.5, max_memory_usage=.5):
-    p = Popen(["nvidia-smi",
-                "--query-gpu=index,utilization.gpu,memory.total,memory.used",
-                "--format=csv,noheader,nounits"], 
-                stdout=PIPE)
+    cmd = ["nvidia-smi",
+           "--query-gpu=index,utilization.gpu,memory.total,memory.used",
+           "--format=csv,noheader,nounits"]
+    p = Popen(cmd, stdout=PIPE)
     output = p.stdout.read().decode('UTF-8')
     gpus = [[int(x) for x in x.split(',')] for x in output.splitlines()]
     gpu_ids = []
@@ -49,5 +49,5 @@ def select_gpus(N, max_utilization=.5, max_memory_usage=.5):
         if utilization / 100.0 < max_utilization:
             if used * 1.0 / total < max_memory_usage:
                 gpu_ids.append(index)
-    selected = np.random.choice(gpu_ids,size=(N, ), replace=False)
+    selected = np.random.choice(gpu_ids, size=(N,), replace=False)
     return list(selected)
