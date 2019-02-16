@@ -8,6 +8,7 @@ from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 
 from mmdet.core import (DistOptimizerHook, DistEvalmAPHook,
                         CocoDistEvalRecallHook, CocoDistEvalmAPHook)
+from mmdet.core.utils.misc import select_gpus
 from mmdet.datasets import build_dataloader
 from mmdet.models import RPN
 from .env import get_root_logger
@@ -107,7 +108,7 @@ def _non_dist_train(model, dataset, cfg, validate=False):
             dist=False)
     ]
     # put model on gpus
-    model = MMDataParallel(model, device_ids=range(cfg.gpus)).cuda()
+    model = MMDataParallel(model, device_ids=select_gpus(cfg.gpus)).cuda()
     # build runner
     runner = Runner(model, batch_processor, cfg.optimizer, cfg.work_dir,
                     cfg.log_level)
